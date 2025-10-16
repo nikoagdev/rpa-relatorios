@@ -1,0 +1,13 @@
+# Arquivo de ambiente com dados sensíveis
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+
+# Ignorar o CONTEÚDO das pastas de relatório, mas manter as pastas
+relatorios_originais/*
+relatorios_convertidos/*
+
+# Adicione aqui outros arquivos que não devem ir para o repositório
+*.log
