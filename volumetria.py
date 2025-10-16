@@ -4,10 +4,20 @@ import pandas as pd
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-# --- CONFIGURAÇÕES ---
-PASTA_PRINCIPAL = r'C:\Users\nikolas.alexandre\OneDrive - unicesumar.edu.br\Área de Trabalho\Bot Integrado'
-PASTA_RELATORIOS = os.path.join(PASTA_PRINCIPAL, 'Relatorios Convertidos')
-ARQUIVO_SAIDA = os.path.join(PASTA_PRINCIPAL, 'Volumetria_Final.xlsx')
+# --- CONFIGURAÇÕES DINÂMICAS ---
+# Pega o caminho absoluto da pasta onde este script está localizado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Define os caminhos relativos à localização do script
+PASTA_RELATORIOS = os.path.join(BASE_DIR, 'relatorios_convertidos') # <-- MUDANÇA AQUI
+ARQUIVO_SAIDA = os.path.join(BASE_DIR, 'Volumetria_Final.xlsx')    # <-- MUDANÇA AQUI
+
+
+# --- O RESTANTE DO SEU CÓDIGO PERMANECE O MESMO ---
+# Nenhuma mudança é necessária na lógica de cálculo ou formatação.
+# Cole o restante do seu código original de volumetria.py aqui, a partir de:
+# COLUNA_DATA = 'Data Solicitação'
+# ... até o final ...
 
 COLUNA_DATA = 'Data Solicitação'
 COLUNA_CANAL = 'Área'
@@ -28,6 +38,7 @@ def calcular_vencimento(data_solicitacao, sla_dias):
         if data_vencimento.weekday() < 5 and data_vencimento not in FERIADOS:
             dias_adicionados += 1
     return data_vencimento
+
 def calcular_dias_uteis_entre(d1, d2):
     if d2 < d1: return -1
     dias_uteis = 0; d_temp = d1
@@ -35,6 +46,7 @@ def calcular_dias_uteis_entre(d1, d2):
         d_temp += timedelta(days=1)
         if d_temp.weekday() < 5 and d_temp not in FERIADOS: dias_uteis += 1
     return dias_uteis
+
 def apply_external_border(ws, cell_range):
     thin = Side(style='thin')
     rows = list(ws[cell_range])
@@ -115,7 +127,6 @@ def main():
     df_volumetria = df_volumetria.reindex(AREAS_DASHBOARD).reindex(columns=colunas_ordenadas).fillna(0).astype(int)
 
     try:
-        # --- AJUSTE PARA SUBSTITUIR ARQUIVO EXISTENTE ---
         if os.path.exists(ARQUIVO_SAIDA):
             print(f"Removendo versão anterior de '{os.path.basename(ARQUIVO_SAIDA)}'...")
             try:
@@ -216,14 +227,13 @@ def main():
                 ws.column_dimensions[col_letter].width = 25
 
         print("-" * 30)
-        print(f"Sucesso! Arquivo '{ARQUIVO_SAIDA}' foi gerado com todas as abas.")
+        print(f"Sucesso! Arquivo '{os.path.basename(ARQUIVO_SAIDA)}' foi gerado com todas as abas.")
         print("-" * 30)
 
         print("\nAbrindo o arquivo de volumetria final...")
         os.startfile(ARQUIVO_SAIDA)
 
     except Exception as e:
-        # Mensagem de erro atualizada para incluir a nova etapa
         print(f"ERRO INESPERADO ao salvar, formatar ou abrir o arquivo: {e}")
 
 if __name__ == '__main__':

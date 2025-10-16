@@ -1,11 +1,14 @@
 import os
 import pandas as pd
 from tqdm import tqdm
-import volumetria 
 
-PASTA_PROJETO = r'C:\Users\nikolas.alexandre\OneDrive - unicesumar.edu.br\Área de Trabalho\Bot Integrado'
-DIRETORIO_ENTRADA = os.path.join(PASTA_PROJETO, 'Relatorios Originais')
-DIRETORIO_SAIDA = os.path.join(PASTA_PROJETO, 'Relatorios Convertidos')
+# --- CONFIGURAÇÕES DINÂMICAS ---
+# Pega o caminho absoluto da pasta onde este script está localizado
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Define os diretórios de entrada e saída relativos à localização do script
+DIRETORIO_ENTRADA = os.path.join(BASE_DIR, 'relatorios_originais') # <-- MUDANÇA AQUI
+DIRETORIO_SAIDA = os.path.join(BASE_DIR, 'relatorios_convertidos') # <-- MUDANÇA AQUI
 
 def converter_arquivo(caminho_entrada, diretorio_saida):
     nome_base_arquivo = os.path.basename(caminho_entrada)
@@ -43,8 +46,6 @@ def converter_arquivo(caminho_entrada, diretorio_saida):
             df_final_temp.columns = cabecalho_final
             df_final = df_final_temp
             
-            # --- LINHA CRÍTICA ADICIONADA AQUI ---
-            # Tenta converter a data para um formato limpo. Se falhar, deixa como está.
             df_final['Data Solicitação'] = pd.to_datetime(df_final['Data Solicitação'], errors='coerce', dayfirst=True)
 
         else:
@@ -63,7 +64,7 @@ def converter_arquivo(caminho_entrada, diretorio_saida):
             nome_arquivo_saida = os.path.splitext(nome_base_arquivo)[0] + '.xlsx'
             caminho_completo_saida = os.path.join(diretorio_saida, nome_arquivo_saida)
             df_final.to_excel(caminho_completo_saida, index=False, engine='openpyxl')
-            print(f"   -> Convertido com sucesso para '{caminho_completo_saida}'.")
+            print(f"   -> Convertido com sucesso para '{os.path.basename(caminho_completo_saida)}'.")
 
     except Exception as e:
         print(f"Ocorreu um erro inesperado ao processar '{nome_base_arquivo}': {e}")
@@ -86,9 +87,7 @@ def executar_conversao():
     print("\n--- PROCESSO DE CONVERSÃO CONCLUÍDO ---")
     return True
 
+# O bloco __main__ agora apenas executa a conversão.
+# A chamada para volumetria foi REMOVIDA daqui.
 if __name__ == '__main__':
-    if executar_conversao():
-        volumetria.main()
-    else:
-        print("\nO script de volumetria não será executado devido a um erro na conversão.")
-    input("\nPressione ENTER para fechar.")
+    executar_conversao()
